@@ -13,11 +13,11 @@ const Barcos = () => {
 
    useEffect(() => {
       const obtenerBarcos = async () => {
-         const options = { method: 'GET', url: 'http://localhost:5000/barcos' };
+         const options = { method: 'GET', url: 'http://localhost:3001/ship' };
 
          await axios.request(options).then(function (response) {
-            console.log("Barcos: ", response.data);
-            setBarcos(response.data);
+            console.log("Barcos: ", response.data.items);
+            setBarcos(response.data.items);
          }).catch(function (error) {
             console.error(error);
          });
@@ -77,7 +77,7 @@ const Barcos = () => {
 
 const TablaBarcos = ({ listaBarcos, setEjecutarConsulta }) => {
    useEffect(() => {
-      console.log("Este es el listado de barcos en el componente de tabla", listaBarcos);
+      console.log("Barcos en el componente TablaBarcos: ", listaBarcos);
    }, [listaBarcos])
 
    return (
@@ -115,25 +115,25 @@ const FilaBarco = ({ barco, setEjecutarConsulta }) => {
    const [edit, setEdit] = useState(false);
    const [infoNuevoBarco, setInfoNuevoBarco] = useState({
       serie: barco.serie,
-      nombre: barco.nombre,
-      marca: barco.marca,
-      modelo: barco.modelo
+      name: barco.name,
+      brand: barco.brand,
+      model: barco.model
    });
 
    const actualizarBarco = async () => {
       console.log(infoNuevoBarco);
       // Enviar la info al backend
       const options = {
-         method: 'PATCH',
-         url: 'http://localhost:5000/barcos/update',
+         method: 'PUT',
+         url: `http://localhost:3001/ship/${barco._id}`,
          headers: { 'Content-Type': 'application/json' },
-         data: { ...infoNuevoBarco, id: barco._id }
+         data: { serie: infoNuevoBarco.serie, name: infoNuevoBarco.name, brand: infoNuevoBarco.brand, model: infoNuevoBarco.model }
       }
 
       await axios
          .request(options)
          .then(function (response) {
-            console.log(response.data);
+            console.log('Nuevos valores: ', response.data);
             toast.success('Barco actualizado con éxito!');
             setEdit(false);
             setEjecutarConsulta(true);
@@ -147,9 +147,9 @@ const FilaBarco = ({ barco, setEjecutarConsulta }) => {
    const eliminarBarco = async () => {
       const options = {
          method: 'DELETE',
-         url: 'http://localhost:5000/barcos/delete',
+         url: `http://localhost:3001/ship/${barco._id}`,
          headers: { 'Content-Type': 'application/json' },
-         data: { id: barco._id }
+         data: {  }
       }
 
       await axios
@@ -184,9 +184,9 @@ const FilaBarco = ({ barco, setEjecutarConsulta }) => {
                      <input
                         className='border border-gray-600 bg-gray-50 p-2 rounded-lg m-2'
                         type="text"
-                        value={infoNuevoBarco.nombre}
+                        value={infoNuevoBarco.name}
                         onChange={(e) =>
-                           setInfoNuevoBarco({ ...infoNuevoBarco, nombre: e.target.value })
+                           setInfoNuevoBarco({ ...infoNuevoBarco, name: e.target.value })
                         }
                      />
                   </td>
@@ -194,9 +194,9 @@ const FilaBarco = ({ barco, setEjecutarConsulta }) => {
                      <input
                         className='border border-gray-600 bg-gray-50 p-2 rounded-lg m-2'
                         type="text"
-                        value={infoNuevoBarco.marca}
+                        value={infoNuevoBarco.brand}
                         onChange={(e) =>
-                           setInfoNuevoBarco({ ...infoNuevoBarco, marca: e.target.value })
+                           setInfoNuevoBarco({ ...infoNuevoBarco, brand: e.target.value })
                         }
                      />
                   </td>
@@ -204,9 +204,9 @@ const FilaBarco = ({ barco, setEjecutarConsulta }) => {
                      <input
                         className='border border-gray-600 bg-gray-50 p-2 rounded-lg m-2'
                         type="text"
-                        value={infoNuevoBarco.modelo}
+                        value={infoNuevoBarco.model}
                         onChange={(e) =>
-                           setInfoNuevoBarco({ ...infoNuevoBarco, modelo: e.target.value })
+                           setInfoNuevoBarco({ ...infoNuevoBarco, model: e.target.value })
                         }
                      />
                   </td>
@@ -216,9 +216,9 @@ const FilaBarco = ({ barco, setEjecutarConsulta }) => {
             (
                <>
                   <td>{barco.serie}</td>
-                  <td>{barco.nombre}</td>
-                  <td>{barco.marca}</td>
-                  <td>{barco.modelo}</td>
+                  <td>{barco.name}</td>
+                  <td>{barco.brand}</td>
+                  <td>{barco.model}</td>
                </>
             )
          }
@@ -261,17 +261,17 @@ const FormularioCreacionBarcos = ({ setMostrarTabla, listaBarcos, setBarcos }) =
          nuevoBarco[key] = val;
       })
 
-      console.log("Nuevo Barco: ", nuevoBarco);
+      console.log("Barco desde formulario : ", nuevoBarco);
 
       const options = {
          method: 'POST',
-         url: 'http://localhost:5000/barcos/nuevo',
+         url: 'http://localhost:3001/ship',
          headers: { 'Content-Type': 'application/json' },
-         data: { serie: nuevoBarco.serie, nombre: nuevoBarco.nombre, marca: nuevoBarco.marca, modelo: nuevoBarco.modelo }
+         data: { serie: nuevoBarco.serie, name: nuevoBarco.name, brand: nuevoBarco.brand, model: nuevoBarco.model }
       };
 
       await axios.request(options).then(function (response) {
-         console.log("Despues de guardar: ", response.data);
+         console.log("Barco retornado despues de guardar: ", response.data);
          toast.success("Barco agregado con éxito!");
       }).catch(function (error) {
          console.error(error);
@@ -299,20 +299,20 @@ const FormularioCreacionBarcos = ({ setMostrarTabla, listaBarcos, setBarcos }) =
                   required
                />
             </label>
-            <label className='flex flex-col' htmlFor="nombre">
+            <label className='flex flex-col' htmlFor="name">
                Nombre
                <input
-                  name="nombre"
+                  name="name"
                   className='border border-gray-600 bg-gray-50 p-2 rounded-lg m-2'
                   type="text"
                   placeholder="Catamaran"
                   required
                />
             </label>
-            <label className='flex flex-col' htmlFor="marca">
+            <label className='flex flex-col' htmlFor="brand">
                Marca
                <select
-                  name="marca"
+                  name="brand"
                   className='border border-gray-600 bg-gray-50 p-2 rounded-lg m-2'
                   defaultValue=''
                   required
@@ -325,10 +325,10 @@ const FormularioCreacionBarcos = ({ setMostrarTabla, listaBarcos, setBarcos }) =
                   <option>OceanBlue</option>
                </select>
             </label>
-            <label className='flex flex-col' htmlFor="modelo">
+            <label className='flex flex-col' htmlFor="model">
                Modelo
                <input
-                  name="modelo"
+                  name="model"
                   className='border border-gray-600 bg-gray-50 p-2 rounded-lg m-2'
                   type="number"
                   placeholder="2021"

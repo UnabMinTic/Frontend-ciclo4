@@ -4,7 +4,7 @@ import ImagenLogo from "./ImagenLogo";
 
 const Sidebar = () => {
    return (
-      <nav className='hidden md:flex md:w-72 flex-col border border-gray-300 h-full bg-gray-200 p-4'>
+      <nav className='hidden md:flex md:w-72 flex-col justify-between border border-gray-300 h-full bg-gray-200 p-4'>
          <Link to='/admin'>
             <ImagenLogo altura={40} />
          </Link>
@@ -16,7 +16,13 @@ const Sidebar = () => {
             <Ruta nombre='Categorias' ruta='/admin/categorias' icono='fa-light fa-list' color='bg-indigo-700' />
             <Ruta nombre='Mensajes' ruta='/admin/mensajes' icono='fa-light fa-envelope' color='bg-indigo-700' />
          </div>
-         <Ruta nombre='Cerrar Sesión' ruta='/' icono='fa-light fa-door-open' color='bg-red-600' />
+         {/* <Ruta nombre='Cerrar Sesión' ruta='/' icono='fa-light fa-door-open' color='bg-red-600' /> */}
+         <Link to='/'>
+            <button
+               className='bg-red-500 p-2 text-white rounded-lg shadow-md hover:bg-red-700'>
+               Cerrar Sesión
+            </button>
+         </Link>
       </nav>
    );
 }
