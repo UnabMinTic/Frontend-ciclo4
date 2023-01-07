@@ -3,6 +3,8 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { nanoid } from "nanoid";
+import Tooltip from '@mui/material/Tooltip'
+import Dialog from "@mui/material/Dialog";
 
 const Barcos = () => {
    const [mostrarTabla, setMostrarTabla] = useState(true);
@@ -76,43 +78,73 @@ const Barcos = () => {
 }
 
 const TablaBarcos = ({ listaBarcos, setEjecutarConsulta }) => {
+   const [busqueda, setBusqueda] = useState('')
+   const [barcosFiltrados, setBarcosFiltrados] = useState(listaBarcos)
+
    useEffect(() => {
-      console.log("Barcos en el componente TablaBarcos: ", listaBarcos);
-   }, [listaBarcos])
+      setBarcosFiltrados(
+         listaBarcos.filter((elemento) => {
+            console.log('elemento: ', elemento)
+            return JSON.stringify(elemento).toLowerCase().includes(busqueda.toLowerCase())
+         })
+      );
+   }, [busqueda, listaBarcos])
 
    return (
       <div className='flex flex-col items-center justify-center w-full'>
+         <input
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            placeholder="Buscar"
+            className="border-2 border-gray-700 px-3 py-1 self-start rounded-md focus: outline-none focus: border-indigo-500"
+         />
          <h2 className='text-2xl font-extrabold text-gray-800'>Todos los Barcos</h2>
-         <table className="tabla">
-            <thead>
-               <tr>
-                  <th>Serie</th>
-                  <th>Nombre</th>
-                  <th>Marca</th>
-                  <th>Modelo</th>
-                  <th>Acciones</th>
-               </tr>
-            </thead>
-            <tbody>
-               {
-                  listaBarcos.map((barco) => {
-                     return (
-                        <FilaBarco
-                           key={nanoid()}
-                           barco={barco}
-                           setEjecutarConsulta={setEjecutarConsulta}
-                        />
-                     )
-                  })
-               }
-            </tbody>
-         </table>
+         <div className="hidden sm:flex w-full">
+            <table className="tabla">
+               <thead>
+                  <tr>
+                     <th>Serie</th>
+                     <th>Nombre</th>
+                     <th>Marca</th>
+                     <th>Modelo</th>
+                     <th>Acciones</th>
+                  </tr>
+               </thead>
+               <tbody>
+                  {
+                     barcosFiltrados.map((barco) => {
+                        return (
+                           <FilaBarco
+                              key={nanoid()}
+                              barco={barco}
+                              setEjecutarConsulta={setEjecutarConsulta}
+                           />
+                        )
+                     })
+                  }
+               </tbody>
+            </table>
+         </div>
+         <div className="flex flex-col w-full m-2 sm:hidden">
+            {barcosFiltrados.map(el => {
+               return <div className="flex flex-col m-2 rounded-xl border border-gray-200 shadow-md">
+                  <span className="bg-gray-500 rounded-t-xl">.</span>
+                  <div className="flex flex-col p-2">
+                     <span>{el.serie}</span>
+                     <span>{el.name}</span>
+                     <span>{el.brand}</span>
+                     <span>{el.model}</span>
+                  </div>
+               </div>
+            })}
+         </div>
       </div>
    )
 }
 
 const FilaBarco = ({ barco, setEjecutarConsulta }) => {
    const [edit, setEdit] = useState(false);
+   const [openDialog, setOpenDialog] = useState(false)
    const [infoNuevoBarco, setInfoNuevoBarco] = useState({
       serie: barco.serie,
       name: barco.name,
@@ -145,11 +177,12 @@ const FilaBarco = ({ barco, setEjecutarConsulta }) => {
    }
 
    const eliminarBarco = async () => {
+      setOpenDialog(false)
       const options = {
          method: 'DELETE',
          url: `http://localhost:3001/ship/${barco._id}`,
          headers: { 'Content-Type': 'application/json' },
-         data: {  }
+         data: {}
       }
 
       await axios
@@ -226,24 +259,57 @@ const FilaBarco = ({ barco, setEjecutarConsulta }) => {
             <div className='flex w-full justify-around'>
                {edit ?
                   (
-                     <i
-                        onClick={() => actualizarBarco()}
-                        className='fas fa-check text-green-700 hover:text-green-500 cursor-pointer'
-                     />
+                     <>
+                        <Tooltip title='Confirmar Edición' arrow>
+                           <i
+                              onClick={() => actualizarBarco()}
+                              className='fas fa-check text-green-700 hover:text-green-500 cursor-pointer'
+                           />
+                        </Tooltip>
+                        <Tooltip title='Cancelar Edición' arrow>
+                           <i
+                              onClick={() => setEdit(!edit)}
+                              className='fas fa-ban text-yellow-700 hover:text-yellow-500 cursor-pointer'
+                           />
+                        </Tooltip>
+                     </>
                   )
                   :
                   (
-                     <i
-                        onClick={() => setEdit(!edit)}
-                        className='fas fa-pencil-alt text-yellow-700 hover:text-yellow-500 cursor-pointer'
-                     />
+                     <>
+                        <Tooltip title='Editar Barco' arrow>
+                           <i
+                              onClick={() => setEdit(!edit)}
+                              className='fas fa-pencil-alt text-yellow-700 hover:text-yellow-500 cursor-pointer'
+                           />
+                        </Tooltip>
+                        <Tooltip title='Eliminar Barco' arrow>
+                           <i
+                              onClick={() => setOpenDialog(true)}
+                              className='fas fa-trash text-red-700 hover:text-red-500 cursor-pointer'
+                           />
+                        </Tooltip>
+                     </>
                   )
                }
-               <i
-                  onClick={() => eliminarBarco()}
-                  className='fas fa-trash text-red-700 hover:text-red-500 cursor-pointer'
-               />
             </div>
+            <Dialog open={openDialog}>
+               <div className='p-8 flex flex-col'>
+                  <h1 className='text-gray-900 text-2xl font-bold'>¿Esta seguro de eliminar el barco?</h1>
+                  <div className='flex w-full justify-center my-4'>
+                     <button
+                        onClick={() => eliminarBarco()}
+                        className='px-4 py-2 mx-2 bg-green-500 text-white hover:bg-green-700 rounded-md'>
+                        Si
+                     </button>
+                     <button
+                        onClick={() => setOpenDialog(false)}
+                        className='px-4 py-2 mx-2 bg-red-500 text-white hover:bg-red-700 rounded-md'>
+                        No
+                     </button>
+                  </div>
+               </div>
+            </Dialog>
          </td>
       </tr>
    );
