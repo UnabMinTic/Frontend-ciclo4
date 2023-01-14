@@ -132,7 +132,7 @@ const TablaCategorias = ({ listaCategorias, setEjecutarConsulta }) => {
          {/* 27. Crear las tarjetas que se veran en pantallas pequeñas */}
          <div className="flex flex-col w-full sm:hidden">
             {
-               listaCategorias.map((el) => {
+               categoriasFiltradas.map((el) => {
                   return (
                      <div className="flex flex-col m-2 rounded-xl border border-gray-200 shadow-md">
                         <span className="bg-gray-500 rounded-t-xl">.</span>
