@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react"
-import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
+import { obtenerBarcos } from "utils/api";
+import axios from "axios";
 import 'react-toastify/dist/ReactToastify.css';
 import { nanoid } from "nanoid";
 import Tooltip from '@mui/material/Tooltip'
@@ -13,20 +14,12 @@ const Barcos = () => {
    const [colorBoton, setColorBoton] = useState('indigo');
    const [ejecutarConsulta, setEjecutarConsulta] = useState(true);
 
-   useEffect(() => {
-      const obtenerBarcos = async () => {
-         const options = { method: 'GET', url: 'http://localhost:3001/ship' };
+   //obtenerBarcos
 
-         await axios.request(options).then(function (response) {
-            console.log("Barcos: ", response.data.items);
-            setBarcos(response.data.items);
-         }).catch(function (error) {
-            console.error(error);
-         });
-      }
+   useEffect(() => {
       if (ejecutarConsulta) {
-         obtenerBarcos();
-         setEjecutarConsulta(false);
+         obtenerBarcos(setBarcos, setEjecutarConsulta);
+         //setEjecutarConsulta(false);
       }
    }, [ejecutarConsulta])
 
@@ -48,15 +41,17 @@ const Barcos = () => {
       }
    }, [mostrarTabla])
 
+   // 1.
    return (
       <div className='flex h-full w-full flex-col items-center justify-start p-8 my-7'>
          <div className='flex flex-col w-full'>
-            <h2 className='text-3xl font-extrabold text-gray-800'>Página de administración de barcos</h2>
+            <h2 className='text-4xl font-extrabold text-gray-800 text-center'>Barcos</h2>
+            {/* 4. Renderización condicional (Tabla/Formulario) */}
             <button
                onClick={() => {
                   setMostrarTabla(!mostrarTabla)
                }}
-               className={`text-white bg-${colorBoton}-500 p-4 rounded-full m-6 w-20 self-end`}
+               className={`text-white bg-${colorBoton}-500 p-4 rounded-full m-6 self-end`}
             >
                {textoBoton}
             </button>
@@ -77,6 +72,7 @@ const Barcos = () => {
    )
 }
 
+// 2. Tabla Barcos
 const TablaBarcos = ({ listaBarcos, setEjecutarConsulta }) => {
    const [busqueda, setBusqueda] = useState('')
    const [barcosFiltrados, setBarcosFiltrados] = useState(listaBarcos)
@@ -96,9 +92,9 @@ const TablaBarcos = ({ listaBarcos, setEjecutarConsulta }) => {
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
             placeholder="Buscar"
-            className="border-2 border-gray-700 px-3 py-1 self-start rounded-md focus: outline-none focus: border-indigo-500"
+            className="border-2 border-gray-700 px-3 py-1 self-start rounded-md focus: outline-none focus:border-indigo-500"
          />
-         <h2 className='text-2xl font-extrabold text-gray-800'>Todos los Barcos</h2>
+         <h2 className='text-2xl font-extrabold text-gray-800'>Listado de Barcos</h2>
          <div className="hidden sm:flex w-full">
             <table className="tabla">
                <thead>
@@ -315,6 +311,7 @@ const FilaBarco = ({ barco, setEjecutarConsulta }) => {
    );
 }
 
+// 3. Foumulario Creación Barcos
 const FormularioCreacionBarcos = ({ setMostrarTabla, listaBarcos, setBarcos }) => {
    const form = useRef(null);
 
@@ -406,8 +403,7 @@ const FormularioCreacionBarcos = ({ setMostrarTabla, listaBarcos, setBarcos }) =
             <button
                type="submit"
                className='col-span-2 bg-green-500 rounded-full p-2 shadow-md hover:bg-green-600 text-white'
-/*                onClick={() => { enviarAlBackend() }}
- */            >
+            >
                Guardar Barco
             </button>
          </form>
