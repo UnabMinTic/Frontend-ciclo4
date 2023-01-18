@@ -26,3 +26,17 @@ export const obtenerCategorias = async (setCategorias, setEjecutarConsulta) => {
    setEjecutarConsulta(false)
 }
 
+/* Usuarios */
+export const obtenerUsuarios = async (setUsuarios, setEjecutarConsulta) => {
+   const options = { method: 'GET', url: 'http://localhost:3001/user' }
+
+   await axios
+      .request(options)
+      .then(function (response) {
+         setUsuarios(response.data.items)
+      })
+      .catch(function (error) {
+         console.error(error)
+      })
+   setEjecutarConsulta(false)
+}

@@ -177,7 +177,7 @@ const FilaCategoria = ({ categoria, setEjecutarConsulta }) => {
             setEdit(false)
             setEjecutarConsulta(true)
          })
-         .catch(function (erroe) {
+         .catch(function (error) {
             toast.error('Error actualizando la categoria!')
          })
    }

@@ -402,7 +402,7 @@ const FormularioCreacionBarcos = ({ setMostrarTabla, listaBarcos, setBarcos }) =
             </label>
             <button
                type="submit"
-               className='col-span-2 bg-green-500 rounded-full p-2 shadow-md hover:bg-green-600 text-white'
+               className='bg-green-500 rounded-full p-2 shadow-md hover:bg-green-600 text-white'
             >
                Guardar Barco
             </button>
